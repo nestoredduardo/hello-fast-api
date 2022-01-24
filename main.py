@@ -77,12 +77,14 @@ def show_person(
     min_length=1, 
     max_length=50, 
     title='Person Name', 
-    description="This is the person name. It's between 1 and 50 char"
+    description="This is the person name. It's between 1 and 50 char",
+    example="Edu"
     ),
   age: int = Query(
     ..., 
     ge=0, 
-    le=120
+    le=120,
+    example=21
     )
 ):
   return {name: age}
