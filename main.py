@@ -1,5 +1,4 @@
 #Python
-from lib2to3.pytree import Base
 from typing import Optional
 from enum import Enum
 
@@ -24,63 +23,41 @@ class HairColor(Enum):
 class Location(BaseModel):
   city: str
   state: str
-  country: str
+  country: str  
 
-class Person(BaseModel):
-  firts_name: str = Field(
-    ...,
-    min_length=1,
-    max_length=50,
-    example="Eduardo"
-    )
-  last_name: str = Field(
-    ...,
-    min_length=1,
-    max_length=50,
-    example="Pantoja"
-    )
-  age: int = Field(
-    ...,
-    gt=0,
-    le=115,
-    example=25
-    )
-  hair_color: Optional[HairColor] = Field(default=None, example="red")
-  is_married: Optional[bool] = Field(default=None, example=True)
-  password: str = Field(..., min_length=6)
+class PersonBase(BaseModel):
+    first_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        example='Marty'
+        )
+    last_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        example='McFly'
+        )
+    age: int = Field(
+        ...,
+        gt=0,
+        le=115,
+        example='20'
+        )
+    hair_color: Optional[HairColor] = Field(default=None, example='black')
+    is_married: Optional[bool] = Field(default=None, example='False')
+    class Config:
+        orm_mode = True
 
-  """ class Config:
-    schema_extra = {
-      "example":{
-        "first_name": "Nestor",
-        "last_name": "Mamani",
-        "age": 21,
-        "hair_color": "black",
-        "is_married": False
-      }
-    } """
+class Person(PersonBase):
+  password: str = Field(
+    ...,
+    min_length=6
+  )
 
-class PersonOut(BaseModel):
-  firts_name: str = Field(
-    ...,
-    min_length=1,
-    max_length=50,
-    example="Eduardo"
-    )
-  last_name: str = Field(
-    ...,
-    min_length=1,
-    max_length=50,
-    example="Pantoja"
-    )
-  age: int = Field(
-    ...,
-    gt=0,
-    le=115,
-    example=25
-    )
-  hair_color: Optional[HairColor] = Field(default=None, example="red")
-  is_married: Optional[bool] = Field(default=None, example=True)
+class PersonOut(PersonBase):
+  pass
+  
 
 
 @app.get('/')
@@ -92,7 +69,7 @@ def home():
 
 @app.post('/person/new', response_model= PersonOut)
 def create_person(person: Person = Body(...)): # 3 puntos significa necesario
-  return Person
+  return person
 
 #Validaciones: Query Parameters
 @app.get('/person/details')
