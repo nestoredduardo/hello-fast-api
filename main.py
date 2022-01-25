@@ -1,4 +1,5 @@
 #Python
+from lib2to3.pytree import Base
 from typing import Optional
 from enum import Enum
 
@@ -46,6 +47,7 @@ class Person(BaseModel):
     )
   hair_color: Optional[HairColor] = Field(default=None, example="red")
   is_married: Optional[bool] = Field(default=None, example=True)
+  password: str = Field(..., min_length=6)
 
   """ class Config:
     schema_extra = {
@@ -58,6 +60,29 @@ class Person(BaseModel):
       }
     } """
 
+class PersonOut(BaseModel):
+  firts_name: str = Field(
+    ...,
+    min_length=1,
+    max_length=50,
+    example="Eduardo"
+    )
+  last_name: str = Field(
+    ...,
+    min_length=1,
+    max_length=50,
+    example="Pantoja"
+    )
+  age: int = Field(
+    ...,
+    gt=0,
+    le=115,
+    example=25
+    )
+  hair_color: Optional[HairColor] = Field(default=None, example="red")
+  is_married: Optional[bool] = Field(default=None, example=True)
+
+
 @app.get('/')
 def home():
   return {'Hello': 'World'}
@@ -65,7 +90,7 @@ def home():
 
 #Request and response body
 
-@app.post('/person/new')
+@app.post('/person/new', response_model= PersonOut)
 def create_person(person: Person = Body(...)): # 3 puntos significa necesario
   return Person
 
