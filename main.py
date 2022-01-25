@@ -1,8 +1,10 @@
 #Python
 from typing import Optional
+from enum import Enum
 
 #Pydantic
 from pydantic import BaseModel
+from pydantic import Field
 
 #FastAPI
 from fastapi import FastAPI
@@ -11,12 +13,50 @@ from fastapi import Body, Query, Path
 app = FastAPI()
 
 #Models
+class HairColor(Enum):
+  white = "white"
+  brown = "brown"
+  black = "black"
+  blonde = "blonde"
+  red = "red"
+
+class Location(BaseModel):
+  city: str
+  state: str
+  country: str
+
 class Person(BaseModel):
-  firts_name: str
-  last_name: str
-  age: int
-  hair_color: Optional[str] = None
-  is_married: Optional[bool] = None
+  firts_name: str = Field(
+    ...,
+    min_length=1,
+    max_length=50,
+    example="Eduardo"
+    )
+  last_name: str = Field(
+    ...,
+    min_length=1,
+    max_length=50,
+    example="Pantoja"
+    )
+  age: int = Field(
+    ...,
+    gt=0,
+    le=115,
+    example=25
+    )
+  hair_color: Optional[HairColor] = Field(default=None, example="red")
+  is_married: Optional[bool] = Field(default=None, example=True)
+
+  """ class Config:
+    schema_extra = {
+      "example":{
+        "first_name": "Nestor",
+        "last_name": "Mamani",
+        "age": 21,
+        "hair_color": "black",
+        "is_married": False
+      }
+    } """
 
 @app.get('/')
 def home():
@@ -37,12 +77,14 @@ def show_person(
     min_length=1, 
     max_length=50, 
     title='Person Name', 
-    description="This is the person name. It's between 1 and 50 char"
+    description="This is the person name. It's between 1 and 50 char",
+    example="Edu"
     ),
   age: int = Query(
     ..., 
     ge=0, 
-    le=120
+    le=120,
+    example=21
     )
 ):
   return {name: age}
@@ -58,3 +100,18 @@ def show_person(
     )
 ):
   return {person_id: True}
+
+#Validaciones: Request body
+@app.put('/person/{person_id}')
+def update_person(
+  person_id: int = Path(...,
+    title='Put Person Id',
+    description="Update Person Data",
+    gt=0
+  ),
+  person: Person = Body(...)
+  #location: Location = Body(...)
+):
+  #results = person.dict()
+  #results.update(location.dict())
+  return person
