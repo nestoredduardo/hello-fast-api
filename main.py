@@ -72,7 +72,10 @@ def home():
 
 #Request and response body
 
-@app.post('/person/new', response_model= PersonOut)
+@app.post(
+  '/person/new', 
+  response_model= PersonOut,
+  tags=['Persons'])
 def create_person(person: Person = Body(...)): # 3 puntos significa necesario
   return person
 
